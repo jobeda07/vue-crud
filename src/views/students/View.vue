@@ -27,69 +27,179 @@
                     <td>{{ student.gpa }}</td>
                     <td>{{ student.address}}</td>
                     <td>
-                       <img :src="`/images/student/${student.image}`" alt="no" class="imgSize">
+                        <img :src="`/images/student/${student.image}`" alt="no" class="imgSize">
 
-                     <!-- <img :src="`/images/student/${student.image}`" alt="" class="imgSize"> -->
+                        <!-- <img :src="`/images/student/${student.image}`" alt="" class="imgSize"> -->
                     </td>
                     <td class="text-center">
-                      <RouterLink :to="{path:'/students/edit/'+student.id}" class="btn btn-success me-2">Edit</RouterLink>
-                      <button @click="deleteStudent(student.id)" class="btn btn-danger">Delete</button>
+                        <RouterLink :to="{path:'/students/edit/'+student.id}" class="btn btn-success me-2">Edit</RouterLink>
+                        <button @click="deleteStudent(student.id)" class="btn btn-danger">Delete</button>
                     </td>
                 </tr>
             </tbody>
             <tbody v-else>
-                <tr >
+                <tr>
                     <th collapse="8">No data</th>
                 </tr>
             </tbody>
         </table>
+        <!-- <nav v-if="last_page > 1" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ disabled: current_page === 1 }">
+                    <button class="page-link" @click="changePage(1)" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" :class="{ disabled: current_page === 1 }">
+                    <button class="page-link" @click="changePage(current_page - 1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </button>
+                </li>
+                <li v-for="page in last_page" :key="page" class="page-item" :class="{ active: page === current_page }">
+                    <button class="page-link" @click="changePage(page)">{{ page }}</button>
+                </li>
+                <li class="page-item" :class="{ disabled: current_page === last_page }">
+                    <button class="page-link" @click="changePage(current_page + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" :class="{ disabled: current_page === last_page }">
+                    <button class="page-link" @click="changePage(last_page)" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </button>
+                </li>
+            </ul>
+        </nav> -->
+        <nav v-if="last_page > 1" aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <!-- First page and previous page buttons -->
+                <li class="page-item" :class="{ disabled: current_page === 1 }">
+                    <button class="page-link" @click="changePage(1)" aria-label="First">
+                        <span aria-hidden="true">&laquo;&laquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" :class="{ disabled: current_page === 1 }">
+                    <button class="page-link" @click="changePage(current_page - 1)" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </button>
+                </li>
+                <!-- Page numbers -->
+                <li v-for="page in pagesToShow" :key="page" class="page-item" :class="{ active: page === current_page }">
+                    <button class="page-link" @click="changePage(page)">{{ page }}</button>
+                </li>
+                <!-- Next page and last page buttons -->
+                <li class="page-item" :class="{ disabled: current_page === last_page }">
+                    <button class="page-link" @click="changePage(current_page + 1)" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </button>
+                </li>
+                <li class="page-item" :class="{ disabled: current_page === last_page }">
+                    <button class="page-link" @click="changePage(last_page)" aria-label="Last">
+                        <span aria-hidden="true">&raquo;&raquo;</span>
+                    </button>
+                </li>
+            </ul>
+        </nav>
+
     </div>
 </div>
 </template>
+
 <script>
 import axios from 'axios';
 export default {
-    name:"students",
-    data(){
-        return{
-            students:[],
+    name: "students",
+    data() {
+        return {
+            students: [],
+            current_page: 1,
+            last_page: 1,
         }
     },
     mounted() {
-        console.log('liza');
+        //console.log('liza');
         this.getStudents();
     },
+    computed: {
+        pagesToShow() {
+            const range = 3; // Number of pages to show around the current page
+            let leftPages = [];
+            let rightPages = [];
+            let startPage, endPage;
+
+            // Determine the pages to show on the left side
+            if (this.current_page <= range) {
+                startPage = 1;
+                endPage = Math.min(this.last_page, range * 2 + 1);
+            } else {
+                startPage = this.current_page - range;
+                endPage = this.current_page + range;
+                if (endPage > this.last_page) {
+                    endPage = this.last_page;
+                }
+            }
+            for (let i = startPage; i <= endPage; i++) {
+                leftPages.push(i);
+            }
+
+            // Determine the pages to show on the right side
+            if (this.current_page >= this.last_page - range) {
+                startPage = Math.max(1, this.last_page - range * 2);
+                endPage = this.last_page;
+            } else {
+                startPage = Math.max(1, this.current_page - range);
+                endPage = Math.min(this.last_page, this.current_page + range);
+            }
+            for (let i = endPage; i >= startPage; i--) {
+                rightPages.push(i);
+            }
+
+            // Remove duplicate pages if the left and right ranges overlap
+            let pages = [...new Set([...leftPages, ...rightPages])];
+
+            // Ensure pages are sorted
+            pages.sort((a, b) => a - b);
+
+            return pages;
+        }
+    },
     methods: {
-        getStudents(){
-           axios.get('http://127.0.0.1:8002/api/student').then(res=>{
-             this.students=res.data.students;
-             console.log(this.students);
-             
-           });
+        getStudents(page = 1) {
+            axios.get(`http://127.0.0.1:8002/api/student?page=${page}`).then(res => {
+                this.students = res.data.students;
+                this.current_page = res.data.current_page;
+                this.last_page = res.data.last_page;
+            });
         },
-        deleteStudent(id){
+        changePage(page) {
+            if (page >= 1 && page <= this.last_page) {
+                this.getStudents(page);
+            }
+        },
+        deleteStudent(id) {
             console.log(id);
-            if(confirm('are you sure to delete this data')){
+            if (confirm('are you sure to delete this data')) {
                 console.log(id);
-                axios.delete(`http://127.0.0.1:8002/api/student/delete/${id}`).then(res=>{
-                    alert(res.data.message);
-                    this.getStudents()
-                })
-                 .catch(function (error) {
-                    if (error.response) {
-                        if (error.response.status == 404) {
-                            alert(error.response.data.message);
+                axios.delete(`http://127.0.0.1:8002/api/student/delete/${id}`).then(res => {
+                        alert(res.data.message);
+                        this.getStudents()
+                    })
+                    .catch(function (error) {
+                        if (error.response) {
+                            if (error.response.status == 404) {
+                                alert(error.response.data.message);
+                            }
                         }
-                    }
-                })
+                    })
             }
         }
     },
 }
 </script>
+
 <style scoped>
- .imgSize{
-     width:80px;
-     height:80px;
- }
+.imgSize {
+    width: 80px;
+    height: 80px;
+}
 </style>
