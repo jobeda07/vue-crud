@@ -29,6 +29,7 @@
             <div class="mb-3">
                 <label for="" class="form-label">Image</label>
                 <input type="file" @change="onFileChange" ref="fileInput" class="form-control" id="studentImage">
+                  <img v-if="model.student.image" :src="model.student.image" alt="no" class="imgSize pt-3">
             </div>
             <div class="mb-3">
                 <label for="exampleFormControlTextarea1" class="form-label">Address</label>
@@ -158,3 +159,9 @@ export default {
     }
 }
 </script>
+<style scoped>
+.imgSize {
+    width: 80px;
+    height: 80px;
+}
+</style>

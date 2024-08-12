@@ -5,9 +5,9 @@
         <RouterLink to="/students/create" class="btn btn-primary float-end">Create</RouterLink>
     </div>
     <div class="card-body">
-    <div>
-      <input type="text"  v-model="searchTerm"  @keyup="searchData"  placeholder="Search students..." class="form-control mb-3" >
-    </div>
+        <div>
+            <input type="text" v-model="searchTerm" @keyup="searchData" placeholder="Search students..." class="form-control mb-3" />
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -22,21 +22,23 @@
                 </tr>
             </thead>
             <tbody v-if="this.students.length > 0">
-                <tr v-for="(student,index) in this.students" :key="index">
+                <tr v-for="(student, index) in this.students" :key="index">
                     <th scope="row">{{ student.id }}</th>
                     <td>{{ student.name }}</td>
                     <td>{{ student.email }}</td>
                     <td>{{ student.phone }}</td>
                     <td>{{ student.gpa }}</td>
-                    <td>{{ student.address}}</td>
+                    <td>{{ student.address }}</td>
                     <td>
-                        <img :src="student.image" alt="no" class="imgSize">
-
-                        <!-- <img :src="`/images/student/${student.image}`" alt="" class="imgSize"> -->
+                        <img v-if="student.image" :src="student.image"  class="imgSize" />
+                        <span v-else>N/A</span>
                     </td>
+
                     <td class="text-center">
-                        <RouterLink :to="{path:'/students/edit/'+student.id}" class="btn btn-success me-2">Edit</RouterLink>
-                        <button @click="deleteStudent(student.id)" class="btn btn-danger">Delete</button>
+                        <RouterLink :to="{ path: '/students/edit/' + student.id }" class="btn btn-success me-2">Edit</RouterLink>
+                        <button @click="deleteStudent(student.id)" class="btn btn-danger">
+                            Delete
+                        </button>
                     </td>
                 </tr>
             </tbody>
@@ -103,13 +105,12 @@
                 </li>
             </ul>
         </nav>
-
     </div>
 </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 export default {
     name: "students",
     data() {
@@ -117,8 +118,8 @@ export default {
             students: [],
             current_page: 1,
             last_page: 1,
-            searchTerm: '',
-        }
+            searchTerm: "",
+        };
     },
     mounted() {
         //console.log('liza');
@@ -165,7 +166,7 @@ export default {
             pages.sort((a, b) => a - b);
 
             return pages;
-        }
+        },
     },
     methods: {
         getStudents(page = 1) {
@@ -174,11 +175,13 @@ export default {
             //     this.current_page = res.data.current_page;
             //     this.last_page = res.data.last_page;
             // });
-             axios.get(`http://127.0.0.1:8002/api/student?page=${page}&search=${this.searchTerm}`).then(res => {
-                this.students = res.data.students;
-                this.current_page = res.data.current_page;
-                this.last_page = res.data.last_page;
-            });
+            axios
+                .get(`http://127.0.0.1:8002/api/student?page=${page}&search=${this.searchTerm}`)
+                .then((res) => {
+                    this.students = res.data.students;
+                    this.current_page = res.data.current_page;
+                    this.last_page = res.data.last_page;
+                });
         },
         changePage(page) {
             if (page >= 1 && page <= this.last_page) {
@@ -190,11 +193,13 @@ export default {
         },
         deleteStudent(id) {
             console.log(id);
-            if (confirm('are you sure to delete this data')) {
+            if (confirm("are you sure to delete this data")) {
                 console.log(id);
-                axios.delete(`http://127.0.0.1:8002/api/student/delete/${id}`).then(res => {
+                axios
+                    .delete(`http://127.0.0.1:8002/api/student/delete/${id}`)
+                    .then((res) => {
                         alert(res.data.message);
-                        this.getStudents()
+                        this.getStudents();
                     })
                     .catch(function (error) {
                         if (error.response) {
@@ -202,11 +207,11 @@ export default {
                                 alert(error.response.data.message);
                             }
                         }
-                    })
+                    });
             }
-        }
+        },
     },
-}
+};
 </script>
 
 <style scoped>
