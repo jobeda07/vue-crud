@@ -25,13 +25,15 @@
                     <td>{{ student.email }}</td>
                     <td>{{ student.phone }}</td>
                     <td>{{ student.gpa }}</td>
-                    <td>{{ student.address.city }} ,{{ student.address.country }}</td>
+                    <td>{{ student.address}}</td>
                     <td>
-                        <img :src="student.image" alt="" class="imgSize">
+                       <img :src="`/images/student/${student.image}`" alt="no" class="imgSize">
+
+                     <!-- <img :src="`/images/student/${student.image}`" alt="" class="imgSize"> -->
                     </td>
                     <td class="text-center">
-                      <RouterLink to="/students/edit" class="btn btn-success me-2">Edit</RouterLink>
-                      <RouterLink to="/students/delete" class="btn btn-danger">Delete</RouterLink>
+                      <RouterLink :to="{path:'/students/edit/'+student.id}" class="btn btn-success me-2">Edit</RouterLink>
+                      <RouterLink :to="{path:'/students/delete/'+student.id}" class="btn btn-danger">Delete</RouterLink>
                     </td>
                 </tr>
             </tbody>
@@ -59,9 +61,10 @@ export default {
     },
     methods: {
         getStudents(){
-           axios.get('https://freetestapi.com/api/v1/students').then(res=>{
-             this.students=res.data;
-             //console.log(this.students);
+           axios.get('http://127.0.0.1:8002/api/student').then(res=>{
+             this.students=res.data.students;
+             console.log(this.students);
+             
            });
         }
     },
@@ -69,7 +72,7 @@ export default {
 </script>
 <style scoped>
  .imgSize{
-     width:50px;
-     height:50px;
+     width:80px;
+     height:80px;
  }
 </style>
