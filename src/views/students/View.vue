@@ -30,7 +30,7 @@
                     <td>{{ student.gpa }}</td>
                     <td>{{ student.address}}</td>
                     <td>
-                        <img :src="`/images/student/${student.image}`" alt="no" class="imgSize">
+                        <img :src="student.image" alt="no" class="imgSize">
 
                         <!-- <img :src="`/images/student/${student.image}`" alt="" class="imgSize"> -->
                     </td>
