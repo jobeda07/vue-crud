@@ -33,7 +33,7 @@
                     </td>
                     <td class="text-center">
                       <RouterLink :to="{path:'/students/edit/'+student.id}" class="btn btn-success me-2">Edit</RouterLink>
-                      <RouterLink :to="{path:'/students/delete/'+student.id}" class="btn btn-danger">Delete</RouterLink>
+                      <button @click="deleteStudent(student.id)" class="btn btn-danger">Delete</button>
                     </td>
                 </tr>
             </tbody>
@@ -52,7 +52,7 @@ export default {
     name:"students",
     data(){
         return{
-            students:[]
+            students:[],
         }
     },
     mounted() {
@@ -66,6 +66,23 @@ export default {
              console.log(this.students);
              
            });
+        },
+        deleteStudent(id){
+            console.log(id);
+            if(confirm('are you sure to delete this data')){
+                console.log(id);
+                axios.delete(`http://127.0.0.1:8002/api/student/delete/${id}`).then(res=>{
+                    alert(res.data.message);
+                    this.getStudents()
+                })
+                 .catch(function (error) {
+                    if (error.response) {
+                        if (error.response.status == 404) {
+                            alert(error.response.data.message);
+                        }
+                    }
+                })
+            }
         }
     },
 }
