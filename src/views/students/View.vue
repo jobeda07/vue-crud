@@ -5,6 +5,9 @@
         <RouterLink to="/students/create" class="btn btn-primary float-end">Create</RouterLink>
     </div>
     <div class="card-body">
+    <div>
+      <input type="text"  v-model="searchTerm"  @keyup="searchData"  placeholder="Search students..." class="form-control mb-3" >
+    </div>
         <table class="table">
             <thead>
                 <tr>
@@ -114,6 +117,7 @@ export default {
             students: [],
             current_page: 1,
             last_page: 1,
+            searchTerm: '',
         }
     },
     mounted() {
@@ -165,7 +169,12 @@ export default {
     },
     methods: {
         getStudents(page = 1) {
-            axios.get(`http://127.0.0.1:8002/api/student?page=${page}`).then(res => {
+            // axios.get(`http://127.0.0.1:8002/api/student?page=${page}`).then(res => {
+            //     this.students = res.data.students;
+            //     this.current_page = res.data.current_page;
+            //     this.last_page = res.data.last_page;
+            // });
+             axios.get(`http://127.0.0.1:8002/api/student?page=${page}&search=${this.searchTerm}`).then(res => {
                 this.students = res.data.students;
                 this.current_page = res.data.current_page;
                 this.last_page = res.data.last_page;
@@ -175,6 +184,9 @@ export default {
             if (page >= 1 && page <= this.last_page) {
                 this.getStudents(page);
             }
+        },
+        searchData() {
+            this.getStudents();
         },
         deleteStudent(id) {
             console.log(id);
